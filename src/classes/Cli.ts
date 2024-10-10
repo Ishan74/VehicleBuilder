@@ -131,6 +131,17 @@ class Cli {
   }
 
   performActions(): void {
+    if (!this.selectedVehicleVin) {
+      console.log("No vehicle selected.");
+      return;
+    }
+  
+    const selectedVehicle = this.vehicles.find(vehicle => vehicle.vin === this.selectedVehicleVin);
+    if (!selectedVehicle) {
+      console.log("Selected vehicle not found.");
+      return;
+    }
+  
     inquirer
       .prompt([{
         type: 'list',
@@ -150,10 +161,45 @@ class Cli {
         ],
       }])
       .then((answers) => {
-        // Add action handling logic here
-        // Check for truck and motorbike specific actions as needed
+        switch (answers.action) {
+          case 'Print details':
+            selectedVehicle.printDetails();
+            break;
+          case 'Start vehicle':
+            selectedVehicle.start();
+            break;
+          case 'Accelerate 5 MPH':
+            selectedVehicle.accelerate(5);
+            break;
+          case 'Decelerate 5 MPH':
+            selectedVehicle.decelerate(5); 
+            break;
+          case 'Stop vehicle':
+            selectedVehicle.stop(); 
+            break;
+          case 'Turn right':
+            selectedVehicle.turn('right'); 
+            break;
+          case 'Turn left':
+            selectedVehicle.turn('left');
+            break;
+          case 'Reverse':
+            selectedVehicle.reverse();
+            break;
+          case 'Select or create another vehicle':
+            this.startCli(); 
+            return;
+          case 'Exit':
+            this.exit = true;
+            console.log("Exiting...");
+            return; 
+        }
+  
+        // After performing the action, prompt the user to perform another action
+        this.performActions();
       });
   }
+  
 
   startCli(): void {
     inquirer
